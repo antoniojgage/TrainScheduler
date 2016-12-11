@@ -1,59 +1,70 @@
-// Initialize Firebase
-var config = {
-    apiKey: "AIzaSyBK8x0wgYA9glOk4f0KzKQ1u6s8--9p7XE",
-    authDomain: "employee-data-management-7ee13.firebaseapp.com",
-    databaseURL: "https://employee-data-management-7ee13.firebaseio.com",
-    storageBucket: "employee-data-management-7ee13.appspot.com",
-    messagingSenderId: "178524481500"
-};
-firebase.initializeApp(config);
+  // Initialize Firebase
+  var config = {
+      apiKey: "AIzaSyBjtHSLIPI6R_4F03Ed_1ldfRc363D2z8M",
+      authDomain: "codingbootcamp-d5453.firebaseapp.com",
+      databaseURL: "https://codingbootcamp-d5453.firebaseio.com",
+      storageBucket: "codingbootcamp-d5453.appspot.com",
+      messagingSenderId: "624473472355"
+  };
+  firebase.initializeApp(config);
 
-var database = firebase.database();
+  var database = firebase.database();
 
-var employeeName;
-var role;
-var startDate;
-var monthlyRate;
-
-
-$("#submit").on("click", function(event) {
+  var trainName;
+  var destination;
+  var startTime;
+  var frequency;
 
 
-    employeeName = $("#employeeName").val().trim();
-    role = $("#role").val().trim();
-    startDate = $("#startDate").val().trim();
-    monthlyRate = $("#monthlyRate").val().trim();
-
-    database.ref().push({
-        employeeName: employeeName,
-        role: role,
-        startDate: startDate,
-        monthlyRate: monthlyRate
-    });
-});
+  $("#submit").on("click", function(event) {
 
 
+      trainName = $("#trainName").val().trim();
+      destination = $("#destination").val().trim();
+      startTime = $("#startTime").val().trim();
+      frequency = $("#frequency").val().trim();
+
+      console.log(frequency);
+      database.ref().push({
+          trainName: trainName,
+          destination: destination,
+          startTime: startTime,
+          frequency: frequency
+      });
+      return false;
+  });
 
 
-database.ref().on("child_added", function(snap) {
-    //This will convert and calculate difference of today from start date
-    var startDateInput = snap.val().startDate;
-    console.log("Start Date = " + startDateInput);
-    var monthsConverted = moment(startDateInput, "MM/DD/YYYY");
-    console.log("months converted= " + monthsConverted);
-    var monthsWorked = moment().diff(monthsConverted, "months");
-    console.log("Months Worked = " + monthsWorked);
-
-    //this will calculate the rate * months worked
-    var totalBilled = monthsWorked * snap.val().monthlyRate;
 
 
-    var newRow = $("<tr>");
-    newRow.append($("<td>" + snap.val().employeeName + "</td>"));
-    newRow.append($("<td>" + snap.val().role + "</td>"));
-    newRow.append($("<td>" + snap.val().startDate + "</td>"));
-    newRow.append($("<td>" + monthsWorked + "</td>"));
-    newRow.append($("<td>" + snap.val().monthlyRate + "</td>"));
-    newRow.append($("<td>" + totalBilled + "</td>"));
-    $("tbody").append(newRow);
-});
+  database.ref().on("child_added", function(snap) {
+      var startTime = snap.val().startTime;
+      var convertedTime = moment(startTime, "HH:mm");
+      convertedTime.format("HHmm");
+      console.log("user entered: " + convertedTime.format("HHmm"));
+      //Difference from start time until now in minutes
+      var currentTime = moment().format("HH:mm");
+      console.log("Current time = " + currentTime);
+      var timeFromStart = moment().diff(convertedTime, "minutes");
+      var minTillNext = -1 * (timeFromStart % snap.val().frequency);
+      console.log(minTillNext.toString());
+      console.log("Minutes until Next Train: " + minTillNext);
+      // console.log("Calc test: " + (currentTime) + minTillNext);
+
+      //minutes time till next
+
+      var nextArrival = moment().add(minTillNext, 'minutes').format("HH:mm");
+      // var nextArrival = currentTime;
+      console.log("testing time " + nextArrival);
+      console.log(nextArrival);
+      // console.log(nextArrival);
+      // moment().add(Duration);
+
+      var newRow = $("<tr>");
+      newRow.append($("<td>" + snap.val().trainName + "</td>"));
+      newRow.append($("<td>" + snap.val().destination + "</td>"));
+      newRow.append($("<td>" + snap.val().frequency + "</td>"));
+      newRow.append($("<td>" + nextArrival + "</td>"));
+      newRow.append($("<td>" + minTillNext + "</td>"));
+      $("tbody").append(newRow);
+  });

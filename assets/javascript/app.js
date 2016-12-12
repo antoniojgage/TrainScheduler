@@ -43,22 +43,13 @@
       convertedTime.format("HHmm");
       console.log("user entered: " + convertedTime.format("HHmm"));
       //Difference from start time until now in minutes
-      var currentTime = moment().format("HH:mm");
-      console.log("Current time = " + currentTime);
-      var timeFromStart = moment().diff(convertedTime, "minutes");
-      var minTillNext = -1 * (timeFromStart % snap.val().frequency);
-      console.log(minTillNext.toString());
-      console.log("Minutes until Next Train: " + minTillNext);
-      // console.log("Calc test: " + (currentTime) + minTillNext);
-
+      var timeFromStart = moment().add(convertedTime, "minutes")
+      console.log("Total time from Train Start: " + timeFromStart);
+      var minTillNext = (timeFromStart % snap.val().frequency);
+      console.log("Next train arriving in " + minTillNext.toString() + " minutes");
       //minutes time till next
-
       var nextArrival = moment().add(minTillNext, 'minutes').format("HH:mm");
-      // var nextArrival = currentTime;
-      console.log("testing time " + nextArrival);
-      console.log(nextArrival);
-      // console.log(nextArrival);
-      // moment().add(Duration);
+      console.log("Next Arrivial time Is: " + nextArrival);
 
       var newRow = $("<tr>");
       newRow.append($("<td>" + snap.val().trainName + "</td>"));

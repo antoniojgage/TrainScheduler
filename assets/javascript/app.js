@@ -10,39 +10,41 @@
 
   var database = firebase.database();
 
+  //Variables called within the table
   var trainName;
   var destination;
   var startTime;
   var frequency;
 
-
+  //Submit button linked to page, takes user input and pushes to firebase
   $("#submit").on("click", function(event) {
-
-
       trainName = $("#trainName").val().trim();
       destination = $("#destination").val().trim();
       startTime = $("#startTime").val().trim();
       frequency = $("#frequency").val().trim();
 
-      console.log(frequency);
+      //push data to firebase
       database.ref().push({
           trainName: trainName,
           destination: destination,
           startTime: startTime,
           frequency: frequency
       });
+      //clear input fields
+      $('.form-control').val('');
+      //force page state to not refresh.
       return false;
   });
 
-
-
-
+  //this method will listen to changes to the firebase DB when children are added
   database.ref().on("child_added", function(snap) {
+
       var startTime = snap.val().startTime;
+      //convert the string/int saved into a moment object.
       var convertedTime = moment(startTime, "HH:mm");
       convertedTime.format("HHmm");
       console.log("user entered: " + convertedTime.format("HHmm"));
-      //Difference from start time until now in minutes
+      //Calculate the difference from start time until now in minutes
       var timeFromStart = moment().add(convertedTime, "minutes")
       console.log("Total time from Train Start: " + timeFromStart);
       var minTillNext = (timeFromStart % snap.val().frequency);
@@ -51,6 +53,7 @@
       var nextArrival = moment().add(minTillNext, 'minutes').format("HH:mm");
       console.log("Next Arrivial time Is: " + nextArrival);
 
+      //create new row for each child found in the DB with the data/calculation requested
       var newRow = $("<tr>");
       newRow.append($("<td>" + snap.val().trainName + "</td>"));
       newRow.append($("<td>" + snap.val().destination + "</td>"));
